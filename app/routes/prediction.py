@@ -22,7 +22,7 @@ def validate_academic_route(data: AcademicInput):
 
 @router.post("/", response_model=ResponseSchema[PredictionOutput])
 def predict_route(data: FullInput, db: Session = Depends(get_db)):
-    result = prediction_service.predict_and_save_service(db, data, model_type="hybrid")
+    result = prediction_service.predict_and_save_service(db, data)
     return ResponseSchema(
         status_code=200,
         message="Prediction successful",

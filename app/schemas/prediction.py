@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Optional,Dict
 
 class AcademicInput(BaseModel):
     nim: str = Field(..., example="20180801041")
@@ -28,6 +28,11 @@ class FullInput(AcademicInput):
     cuti_ambil: Optional[int] = Field(None, example=0, description="Skala 0-3")
     cuti_alasan: Optional[int] = Field(None, example=0, description="Skala 0-3")
 
+class FactorDetail(BaseModel):
+    skor: int
+    deskripsi: str
+    rekomendasi: str
+
 
 class PredictionOutput(BaseModel):
     nim: str
@@ -35,6 +40,10 @@ class PredictionOutput(BaseModel):
     prediction: int
     label: str
     total_skor: Optional[int] = None
+    level_risiko: Optional[str] = None
+    level_emoji: Optional[str] = None
+    faktor_skor: Optional[Dict[str, FactorDetail]] = None  # ✅ lebih ketat
+    pesan: Optional[str] = None
     created_at: datetime
 
 
