@@ -3,12 +3,22 @@ from sqlalchemy.orm import Session
 from app.database import Base, engine, get_db
 from app.models.prediction import MahasiswaRespon  # ✅ import model
 from app.routes import prediction
+from fastapi.middleware.cors import CORSMiddleware
 
 
 
 Base.metadata.create_all(bind=engine)
 # inisialisasi aplikasi
 app = FastAPI(title="Dropout API", version="1.0")
+
+# Tambahkan middleware CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # bisa dibatasi ke ["http://localhost:5173"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # endpoint GET sederhana
 @app.get("/")

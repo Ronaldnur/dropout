@@ -16,7 +16,6 @@ class AcademicOutput(BaseModel):
     prediction: Optional[int]  # None = lanjut ML, 1 = langsung DO
     label: str
 
-
 class FullInput(AcademicInput):
     # Faktor ekonomi
     ekonomi_tunggakan: Optional[int] = Field(None, example=1, description="Skala 0-3")
@@ -45,6 +44,7 @@ class PredictionOutput(BaseModel):
     faktor_skor: Optional[Dict[str, FactorDetail]] = None  # ✅ lebih ketat
     pesan: Optional[str] = None
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
 
 class PredictionDB(BaseModel):

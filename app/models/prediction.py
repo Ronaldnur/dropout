@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, DECIMAL, TIMESTAMP, func, SmallInteger
+from sqlalchemy import Column, Integer, String, DECIMAL, TIMESTAMP, func, SmallInteger,DateTime
 from app.database import Base 
+from datetime import datetime  # <--- ini yang p
 
 class MahasiswaRespon(Base):
     __tablename__ = "mahasiswa_respon"
@@ -29,3 +30,4 @@ class MahasiswaRespon(Base):
     total_skor = Column(Integer, nullable=True)
     prediksi = Column(SmallInteger, nullable=True)  
     created_at = Column(TIMESTAMP, server_default=func.now())
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)

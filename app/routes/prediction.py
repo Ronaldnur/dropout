@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends,Body
 from sqlalchemy.orm import Session
 from app.schemas.prediction import AcademicInput, AcademicOutput, FullInput, PredictionOutput,PredictionDB
 from app.services import prediction_service
@@ -12,13 +12,14 @@ router = APIRouter(
 )
 
 @router.post("/validate", response_model=ResponseSchema[AcademicOutput])
-def validate_academic_route(data: AcademicInput):
-    result = prediction_service.validate_academic_service(data)
+def validate_academic_route(db: Session = Depends(get_db), data: AcademicInput = Body(...)):
+    result = prediction_service.validate_academic_service(db, data)
     return ResponseSchema(
         status_code=200,
         message="Validation successful",
         data=result
     )
+
 
 @router.post("/", response_model=ResponseSchema[PredictionOutput])
 def predict_route(data: FullInput, db: Session = Depends(get_db)):
@@ -28,6 +29,7 @@ def predict_route(data: FullInput, db: Session = Depends(get_db)):
         message="Prediction successful",
         data=result
     )
+
 
 
 @router.get("/", response_model=ResponseSchema[List[PredictionDB]])
