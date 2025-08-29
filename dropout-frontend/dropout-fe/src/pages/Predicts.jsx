@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import InitialForm from "../components/InitialForm";
 import MLForm from "../components/MLForm";
 import ResultDisplay from "../components/ResultDisplay";
-import { postPrediction } from "../services/predictService";
+// Impor kedua fungsi dari service
+import { postPrediction, validatePrediction } from "../services/predictService";
 
 function Predicts() {
   const [step, setStep] = useState("initial"); // initial | ml | result
@@ -22,53 +23,55 @@ function Predicts() {
     }
   };
 
-  // Submit dari InitialForm
+  // Submit dari InitialForm (INI BAGIAN UTAMA YANG DIUBAH)
   const handleInitialSubmit = async (data) => {
     setIsLoading(true);
-    setInitialData(data);
+    // Simpan data awal untuk jaga-jaga jika butuh ke step ML
+    setInitialData(data); 
 
     try {
-      const payload = {
+      // 1. Buat payload khusus untuk validasi
+      const validationPayload = {
         nim: data.nim,
         nama: data.nama,
         sks_lulus: Number(data.sksLulus),
         semester: Number(data.semester),
         ipk: Number(data.ipk),
-        ekonomi_tunggakan: 0,
-        ekonomi_bayar: 0,
-        stress_beban: 0,
-        stress_motivasi: 0,
-        cuti_ambil: 0,
-        cuti_alasan: 0,
       };
 
-      const response = await postPrediction(payload);
+      // 2. Panggil API validasi, bukan prediksi
+      const response = await validatePrediction(validationPayload);
 
-      // Kalau backend butuh ML
-      if (response?.data?.prediction === -1) {
+      // 3. Cek respons dari backend (sesuai contoh Anda)
+      if (response.data?.label === "Lanjut ML") {
+        // Jika backend meminta data ML, lanjut ke step "ml"
         setStep("ml");
       } else {
+        // Jika backend langsung memberi hasil, format dan tampilkan
         setPredictionResult(formatResult(response.data));
         setStep("result");
       }
     } catch (error) {
       console.error(error);
-      alert("Gagal memproses prediksi awal.");
+      alert("Gagal memproses validasi awal.");
     }
 
     setIsLoading(false);
   };
 
-  // Submit dari MLForm
+  // Submit dari MLForm (TIDAK PERLU DIUBAH)
   const handleMLSubmit = async (mlData) => {
     setIsLoading(true);
 
     try {
       const payload = {
-        ...initialData,
+        // Menggunakan data dari state initialData
+        nim: initialData.nim,
+        nama: initialData.nama,
         sks_lulus: Number(initialData.sksLulus),
         semester: Number(initialData.semester),
         ipk: Number(initialData.ipk),
+        // Menambahkan data dari MLForm
         ekonomi_tunggakan: convertToScore(mlData.ekonomiTunggakan),
         ekonomi_bayar: convertToScore(mlData.ekonomiBayar),
         stress_beban: convertToScore(mlData.stressBeban),
@@ -89,9 +92,9 @@ function Predicts() {
     setIsLoading(false);
   };
 
-  // format data dari backend supaya kompatibel dengan ResultDisplay
+  // format data dari backend supaya kompatibel dengan ResultDisplay (TIDAK PERLU DIUBAH)
   const formatResult = (data) => ({
-    levelRisiko: data.level_risiko,
+    levelRisiko: data.level_risiko || data.academic_status, // Fallback untuk hasil validasi
     totalSkor: data.total_skor,
     faktor: Object.entries(data.faktor_skor || {}).map(([key, val]) => ({
       name: key,
@@ -101,12 +104,14 @@ function Predicts() {
     pesan: data.pesan,
   });
 
+  // Fungsi reset (TIDAK PERLU DIUBAH)
   const handleReset = () => {
     setStep("initial");
     setInitialData(null);
     setPredictionResult(null);
   };
 
+  // Fungsi render (TIDAK PERLU DIUBAH)
   const renderContent = () => {
     if (isLoading) return <div className="text-center mt-6">Loading...</div>;
 
@@ -121,10 +126,7 @@ function Predicts() {
   };
 
   return (
-    <div className="container p-6">
-      <h1 className="text-2xl font-bold text-center mb-4">
-        Drop Out Prediction
-      </h1>
+    <div className="container">
       {renderContent()}
     </div>
   );

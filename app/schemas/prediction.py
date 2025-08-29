@@ -61,7 +61,7 @@ class PredictionDB(BaseModel):
     cuti_ambil: Optional[int]
     cuti_alasan: Optional[int]
     total_skor: Optional[int]
-    prediksi: int
+    prediksi: Optional[int] =None
     created_at: datetime
 
     class Config:

@@ -6,8 +6,8 @@ def validate_academic(sks_lulus: int, semester: int, ipk: float):
     """
 
     # Cek range semester
-    if not (1 <= semester <= 14):
-        return "Semester di luar range (1-14)", None, "Tidak Valid"
+    if not (7 <= semester <= 14):
+        return "Semester di luar range (7-14)", None, "Tidak Valid"
 
     # Cek IPK rendah → langsung DO
     if ipk < 2.0:
@@ -21,7 +21,7 @@ def validate_academic(sks_lulus: int, semester: int, ipk: float):
     # Rata-rata SKS per semester
     avg_sks = sks_lulus / semester
     min_avg = 144 / 14  # rata-rata minimal per semester
-    max_avg = 144 / 1   # rata-rata maksimal per semester
+    max_avg = 144 / 7   # rata-rata maksimal per semester
 
     # Kasus jelas aman
     if sks_lulus >= 144 and ipk >= 2.0 and semester <= 14:
