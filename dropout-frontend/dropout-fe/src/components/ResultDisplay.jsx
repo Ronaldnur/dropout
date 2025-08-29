@@ -2,7 +2,7 @@ import React from 'react';
 
 // --- Helper Icons (SVG) ---
 const WarningIcon = () => (
-  <svg xmlns="http://www.w.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
   </svg>
 );
@@ -23,7 +23,6 @@ const factorLabels = {
   cutiAlasan: 'Potensi Pengambilan Cuti',
 };
 
-
 function ResultDisplay({ data, onReset }) {
   if (!data) {
     return (
@@ -33,8 +32,20 @@ function ResultDisplay({ data, onReset }) {
     );
   }
 
-  const isAtRisk = ['Sangat Tinggi', 'Tinggi', 'Sedang'].includes(data.levelRisiko);
+  // --- Cek kondisi khusus ---
+  const isOutOfRange = data.levelRisiko && data.levelRisiko.toLowerCase().includes("luar range");
 
+const isAtRisk =
+  !isOutOfRange &&
+  (
+    ['Sangat Tinggi', 'Tinggi', 'Sedang'].includes(data.levelRisiko) ||
+    (data.levelRisiko &&
+      data.levelRisiko.toLowerCase().includes("do") &&
+      !data.levelRisiko.toLowerCase().includes("tidak do"))
+  );
+
+
+  // --- Konfigurasi UI berdasarkan status ---
   const resultConfig = {
     atRisk: {
       bgColor: 'bg-red-50',
@@ -50,9 +61,19 @@ function ResultDisplay({ data, onReset }) {
       icon: <CheckCircleIcon />,
       title: 'Tidak Beresiko Dropout',
     },
+    outOfRange: {
+      bgColor: 'bg-yellow-50',
+      textColor: 'text-yellow-800',
+      borderColor: 'border-yellow-200',
+      icon: <WarningIcon />,
+      title: 'Analisis Tidak Dapat Dilakukan',
+    },
   };
 
-  const config = isAtRisk ? resultConfig.atRisk : resultConfig.safe;
+  const config = isOutOfRange
+    ? resultConfig.outOfRange
+    : (isAtRisk ? resultConfig.atRisk : resultConfig.safe);
+
   const hasMlFactors = data.faktor && data.faktor.length > 0;
 
   return (
@@ -65,7 +86,6 @@ function ResultDisplay({ data, onReset }) {
         <h2 className="text-4xl font-extrabold">{config.title}</h2>
         <p className="mt-2 text-lg">
           Level Risiko: <strong>{data.levelRisiko}</strong>
-          {/* --- PERUBAHAN DI SINI: Total Skor hanya tampil jika ada faktor ML --- */}
           {hasMlFactors && (
             <span> (Total Skor: {data.totalSkor})</span>
           )}

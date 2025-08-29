@@ -58,7 +58,7 @@ export default function PredictionDetail() {
   }
 
   // Menghapus (Nilai: X) dari teks hasil prediksi
-  const predictionResultText = prediction.prediksi === 1 ? 'Berisiko Dropout' : 'Tidak Beresiko Dropout';
+  const predictionResultText = prediction.prediksi === 0 ? 'Berisiko Dropout' : 'Tidak Beresiko Dropout';
 
   return (
     <div className="w-full p-6 space-y-8 font-poppins">
