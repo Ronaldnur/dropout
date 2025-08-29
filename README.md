@@ -61,7 +61,7 @@ Aplikasi frontend sekarang dapat diakses di http://localhost:5173 (atau port lai
 Layanan ini menjalankan aplikasi chatbot secara terpisah.
 
 # 1. Buka terminal baru dan arahkan ke direktori chatbot
-cd chatbot
+cd dropout
 
 # 2. (Jika ada requirements.txt di folder chatbot, instal dependensinya)
 # pip install -r requirements.txt
