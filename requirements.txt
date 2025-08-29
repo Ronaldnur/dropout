@@ -9,3 +9,5 @@ psycopg2
 xgboost
 python-dotenv
 Flask
+google-generativeai
+flask-cors
