@@ -3,7 +3,7 @@ import ChatWindow from '../components/ChatWindow';
 import MessageInput from '../components/MessageInput';
 import '../index.css';
 
-const API_URL = 'http://localhost:5000/chat';
+const API_URL = import.meta.env.VITE_API_URL_2;
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([
