@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends,Body
+from fastapi import APIRouter, Depends,Body,UploadFile, File
 from sqlalchemy.orm import Session
 from app.schemas.prediction import AcademicInput, AcademicOutput, FullInput, PredictionOutput,PredictionDB
 from app.services import prediction_service
@@ -49,4 +49,18 @@ def get_prediction_by_nim(nim: str, db: Session = Depends(get_db)):
         status_code=200,
         message="Prediction detail",
         data=result
+    )
+
+
+# === Bulk predict dari Excel/CSV ===
+@router.post("/bulk", response_model=ResponseSchema[list])
+def predict_bulk_route(
+    file: UploadFile = File(...), 
+    db: Session = Depends(get_db)
+):
+    results = prediction_service.bulk_predict_service(db, file)
+    return ResponseSchema(
+        status_code=200,
+        message="Bulk prediction successful",
+        data=results
     )

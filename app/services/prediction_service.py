@@ -5,7 +5,10 @@ from app.schemas.prediction import AcademicInput, AcademicOutput, FullInput, Pre
 from app.utils.logic import validate_academic
 from typing import List
 from datetime import datetime
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
+import pandas as pd
+import io
+from datetime import datetime
 
 
 def validate_academic_service(db: Session, data: AcademicInput) -> AcademicOutput:
@@ -201,3 +204,59 @@ def get_prediction_by_nim_service(db: Session, nim: str) -> PredictionDB:
     if not record:
         raise HTTPException(status_code=404, detail="Mahasiswa tidak ditemukan")
     return record
+
+
+# Daftar fitur untuk ML (harus sama persis dengan yang dipakai saat training)
+ML_FEATURES = [
+    "sks_lulus", "semester", "ipk",
+    "ekonomi_tunggakan", "ekonomi_bayar",
+    "stress_beban", "stress_motivasi",
+    "cuti_ambil", "cuti_alasan"
+]
+
+
+import pandas as pd
+from fastapi import UploadFile
+from sqlalchemy.orm import Session
+
+def bulk_predict_service(db: Session, file: UploadFile):
+    """
+    Service untuk bulk prediction dari file (CSV/XLSX).
+    - Validasi rules akademik
+    - Prediksi ML dengan XGBoost untuk data yang tidak diputuskan rules
+    - Simpan hasil ke database
+    """
+    # --- Step 0: Baca file ---
+    contents = file.file.read()
+    file.file.seek(0)
+
+    if file.filename.endswith(".csv"):
+        df = pd.read_csv(file.file)
+    elif file.filename.endswith((".xls", ".xlsx")):
+        df = pd.read_excel(file.file)
+    else:
+        raise ValueError("Format file tidak didukung (hanya CSV/XLSX)")
+
+    results = []
+
+    # --- Step 1: Iterasi tiap mahasiswa ---
+    for _, row in df.iterrows():
+        data = FullInput(
+            nim=str(row.get("nim")),
+            nama=row.get("nama"),
+            sks_lulus=row.get("sks_lulus"),
+            semester=row.get("semester"),
+            ipk=row.get("ipk"),
+            ekonomi_tunggakan=row.get("ekonomi_tunggakan"),
+            ekonomi_bayar=row.get("ekonomi_bayar"),
+            stress_beban=row.get("stress_beban"),
+            stress_motivasi=row.get("stress_motivasi"),
+            cuti_ambil=row.get("cuti_ambil"),
+            cuti_alasan=row.get("cuti_alasan"),
+        )
+
+        # --- Prediksi tiap mahasiswa ---
+        result = predict_and_save_service(db, data)
+        results.append(result)
+
+    return results
