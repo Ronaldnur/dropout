@@ -53,3 +53,23 @@ export const getPredictionByNim = async (nim) => {
     throw error;
   }
 };
+
+
+// ========== Tambahan untuk Bulk Prediction ==========
+export const postBulkPrediction = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file); // 'file' harus sama dengan parameter UploadFile di backend
+
+    const response = await axios.post(`${API_URL}bulk`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error hit API bulk prediction:", error);
+    throw error;
+  }
+};

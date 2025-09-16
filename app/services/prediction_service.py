@@ -206,13 +206,6 @@ def get_prediction_by_nim_service(db: Session, nim: str) -> PredictionDB:
     return record
 
 
-# Daftar fitur untuk ML (harus sama persis dengan yang dipakai saat training)
-ML_FEATURES = [
-    "sks_lulus", "semester", "ipk",
-    "ekonomi_tunggakan", "ekonomi_bayar",
-    "stress_beban", "stress_motivasi",
-    "cuti_ambil", "cuti_alasan"
-]
 
 
 import pandas as pd
@@ -220,12 +213,7 @@ from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
 def bulk_predict_service(db: Session, file: UploadFile):
-    """
-    Service untuk bulk prediction dari file (CSV/XLSX).
-    - Validasi rules akademik
-    - Prediksi ML dengan XGBoost untuk data yang tidak diputuskan rules
-    - Simpan hasil ke database
-    """
+    
     # --- Step 0: Baca file ---
     contents = file.file.read()
     file.file.seek(0)

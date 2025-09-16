@@ -60,7 +60,7 @@ def predict_bulk_route(
 ):
     results = prediction_service.bulk_predict_service(db, file)
     return ResponseSchema(
-        status_code=200,
+        status_code=201,
         message="Bulk prediction successful",
         data=results
     )
